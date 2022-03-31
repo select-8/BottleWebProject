@@ -26,7 +26,7 @@ def hello():
 @route('/show/<view>', method='GET')
 def showall(view,db):
 
-    conn = sqlite3.connect(r"C:\Users\loconnor\Documents\BottleApp\simpledb.db")
+    conn = sqlite3.connect(r"./data/simpledb.db")
     c = conn.cursor()
     rows = c.execute('SELECT * from points').fetchall()
     columns = c.execute('PRAGMA table_info(points);').fetchall()
@@ -60,7 +60,7 @@ def add_new():
 
 @route('/new', method='POST')
 def add_new():
-    conn = sqlite3.connect(r"C:\Users\loconnor\Documents\BottleApp\simpledb.db")
+    conn = sqlite3.connect(r"./data/simpledb.db")
     c = conn.cursor()
     city = request.forms.get('newcity')
     colour = request.forms.get('newcolour')

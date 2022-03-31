@@ -40,6 +40,6 @@ if __name__ == '__main__':
         the server should be configured to serve the static files."""
         return bottle.static_file(filepath, root=STATIC_ROOT)
 
-    plugin = sqlite.Plugin(dbfile=r"C:\Users\loconnor\Documents\BottleApp\simpledb.db")
+    plugin = sqlite.Plugin(dbfile=r"./data/simpledb.db") # not used atm
     bottle.install(plugin)
     bottle.run(server='wsgiref', host=HOST, port=PORT, reloader=True, debug=True)
