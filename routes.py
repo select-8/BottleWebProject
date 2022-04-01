@@ -9,12 +9,20 @@ import sqlite3
 
 #helper functions
 def zipper(rows,headers):
-    res = []
-    for r in rows:
-        zipped = zip(tuple(headers),r)
-        res.append(tuple(zipped))
 
-    return res
+    # zip headers and rows and add to list
+    zipped_data = []
+    for r in rows:
+        zipped = zip(headers,r)
+        zipped_data.append(list(zipped))
+
+    # convert tuples to a dictionary
+    zipped_data_as_dict = []
+    for r in zipped_data:
+        tups_to_dict = {key: value for key, value in r}
+        zipped_data_as_dict.append(tups_to_dict)
+
+    return zipped_data
 
 
 @route('/')
@@ -38,7 +46,7 @@ def showall(view,db):
 
     table_data = zipper(rows,headers)
 
-    #for td in table_data:
+    # for td in table_data:
     #    print(td)
 
     if rows:
@@ -68,6 +76,7 @@ def add_new():
     conn.commit()
     redirect("/")
     c.close()
+
 
 @route('/update', method='POST')
 def update_row():
