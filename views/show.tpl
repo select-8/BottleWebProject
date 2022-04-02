@@ -1,22 +1,20 @@
 % rebase('layout.tpl')
-<table class="table table-striped">
+<table class="table table-bordered">
 <thead>
   <tr>
   %for h in columns:
     <th scope="col">{{h[1]}}</th>
   %end
-%for row in table_data:
-<tbody>
-
-  <tr>
-  % for col in row:
-  <td class="c2">{{col[1]}}</td>
-  % end
-  <td><button type="button" class="btn btn-info">Edit</button></td>
-  <td><button type="button" class="btn btn-danger">Delete</button></td>
-  </tr>
-</tbody>
-%end
+</thead>
+% for td in table_data:
+<tr id={{td['ID']}}>
+% for key, value in td.items():
+    <td class="row-data">{{value}}</td>
+% end
+<td><button type="submit" onclick="show()" class="btn btn-info" name="alterdata">Edit</button></td>
+<td><button type="button" class="btn btn-danger">Delete</button></td>
+</tr>
+% end
 </table>
-</br>
+<br />
 % include('button.tpl') 

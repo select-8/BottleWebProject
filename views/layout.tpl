@@ -26,6 +26,7 @@
     <script src="/static/scripts/bootstrap.js"></script>
     <script src="/static/scripts/respond.js"></script>
     <script src="/static/scripts/map.js"></script>
+    <script src="/static/scripts/script.js"></script>
 
 </body>
 </html>

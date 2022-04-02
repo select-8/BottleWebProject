@@ -22,7 +22,7 @@ def zipper(rows,headers):
         tups_to_dict = {key: value for key, value in r}
         zipped_data_as_dict.append(tups_to_dict)
 
-    return zipped_data
+    return zipped_data_as_dict
 
 
 @route('/')
@@ -46,12 +46,9 @@ def showall(view,db):
 
     table_data = zipper(rows,headers)
 
-    # for td in table_data:
-    #    print(td)
-
     if rows:
         if view == 'table':
-            output = template('show', table_data=table_data, columns=columns, rows=rows)
+            output = template('show', table_data=table_data, columns=columns)
         elif view == 'raw':
             output = json.dumps(rows)
         else:
@@ -60,6 +57,7 @@ def showall(view,db):
 
     if request.forms.get('newdata'):
         redirect("/new")
+
 
 @route('/new')
 def add_new():
@@ -85,15 +83,35 @@ def update_row():
     redirect("/")
 
 
-@post('/button')
+@post('/add_item_button')
 def goadd():
 
     if request.forms.get('newdata'):
         redirect("/new")
 
 
-@post('/postmethod',is_xhr=True)
-def get_javascript_data():
+@post('/get_row_to_edit',is_xhr=True)
+def goedit():
+
+    id = json.load(request.body)
+    conn = sqlite3.connect("./data/simpledb.db")
+    c = conn.cursor()
+    query = "SELECT * FROM points WHERE ID = {}".format(id)
+    data_to_edit = c.execute(query).fetchall()
+    conn.commit()
+    redirect("/edit_the_row/{}".format(data_to_edit[0]))
+
+
+from ast import literal_eval
+@route('/edit_the_row/<data>')
+def open_edit_form(data):
+    data_in_a_list = list(literal_eval(data))
+    # print(type(data_in_a_list))
+    print(data_in_a_list)
+
+
+@post('/mapdata',is_xhr=True)
+def get_map_data():
 
     geog = json.load(request.body)
 
