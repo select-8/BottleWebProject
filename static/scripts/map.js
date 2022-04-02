@@ -18,5 +18,34 @@ map.on('click', function (e) {
     xhr.setRequestHeader("Content-Type", "application/json");
 
     xhr.send(data);
-
 });
+
+
+function httpGet(theUrl)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.send( null );
+
+    data = JSON.parse(xmlHttp.responseText)
+    return data;
+};
+
+function addMarker(lat,long,value,colour) {
+    var circle = L.circle([lat, long], {
+        color: colour,
+        // fillColor: '#f03',
+        // fillOpacity: 0.5,
+        radius: value*4
+    }).addTo(map);
+};
+
+var data = httpGet('http://localhost:5555/show/raw')
+console.log(data);
+for (let i = 0; i < data.length; i++) {
+    if (data[i][2] !== null) {
+        addMarker(data[i][3],data[i][2],data[i][4],data[i][5]);
+      };
+  };
+
+

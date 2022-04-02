@@ -106,8 +106,13 @@ from ast import literal_eval
 @route('/edit_the_row/<data>')
 def open_edit_form(data):
     data_in_a_list = list(literal_eval(data))
-    # print(type(data_in_a_list))
-    print(data_in_a_list)
+    if data_in_a_list:
+        return template('edit', data_in_a_list=data)
+        
+
+# @route('/time_to_edit/<data>')
+# def getediting(data):
+#     return template('edit', data_in_a_list=data)
 
 
 @post('/mapdata',is_xhr=True)

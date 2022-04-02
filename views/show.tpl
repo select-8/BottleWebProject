@@ -11,7 +11,10 @@
 % for key, value in td.items():
     <td class="row-data">{{value}}</td>
 % end
-<td><button type="submit" onclick="show()" class="btn btn-info" name="alterdata">Edit</button></td>
+<td>
+<form action="/get_row_to_edit" method="post">
+<button type="submit" onclick="show()" class="btn btn-info">Edit</button></td>
+</form>
 <td><button type="button" class="btn btn-danger">Delete</button></td>
 </tr>
 % end
