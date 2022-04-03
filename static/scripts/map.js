@@ -8,6 +8,7 @@ L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.pn
     subdomains: 'abcd'
 }).addTo(map);
 map.setZoom(7);
+
 map.on('click', function (e) {
 
     var data = JSON.stringify({ 'data': { 'long': e.latlng.lng, 'lat': e.latlng.lat } });
@@ -35,8 +36,6 @@ function httpGet(theUrl)
 function addMarker(lat,long,value,colour) {
     var circle = L.circle([lat, long], {
         color: colour,
-        // fillColor: '#f03',
-        // fillOpacity: 0.5,
         radius: value*4
     }).addTo(map);
 };

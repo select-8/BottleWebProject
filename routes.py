@@ -27,19 +27,20 @@ def zipper(rows,headers):
 
 
 @route('/')
-def hello():
-    """Renders a sample page."""
+def index():
     redirect('/show/table')
 
 
-@route('/show/<view>', method=['GET','POST'])
+@route('/show/<view>')
 def showall(view,db):
 
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
     rows = c.execute('SELECT * FROM points WHERE IsVisible = 1').fetchall()
-    # for r in rows:
-    #     print('Row: ', r)
+    print('')
+    for r in rows:
+        print('Row: ', r)
+    print('')
     columns = c.execute('PRAGMA table_info(points);').fetchall()
     
     headers = []
@@ -51,9 +52,10 @@ def showall(view,db):
     columns = columns[:-1]
 
     table_data = zipper(rows,headers)
-    # for td in table_data:
-    #     print('As a Dict:', td)
 
+    for td in table_data:
+        print('As a Dict:', td)
+    print('')
     if rows:
         if view == 'table':
             output = template('show', table_data=table_data, columns=columns)
@@ -63,13 +65,13 @@ def showall(view,db):
             output = HTTPError(404, "Page not found")
         return output
 
-    if request.forms.get('newdata'):
-        redirect("/new")
+    # if request.forms.get('newdata'):
+    #     redirect("/new")
 
 
-@route('/new')
-def add_new():
-    return template('add_data')
+# @route('/new')
+# def add_new():
+#     return template('add_data')
 
 
 @route('/new', method='POST')
@@ -91,36 +93,36 @@ def add_new():
 def goadd():
 
     if request.forms.get('newdata'):
-        redirect("/new")
+        #redirect("/new")
+        return template('add_data')
 
 
 @route('/get_row_to_edit',is_xhr=True, method=['GET', 'POST'])
 def goedit():
     if request:
         id = json.load(request.body)
-        print(id)
-        conn = sqlite3.connect("./data/simpledb.db")
-        c = conn.cursor()
-        query = "SELECT * FROM points WHERE ID = {}".format(id)
-        data_to_edit = c.execute(query).fetchall()
-
-        conn.commit()
-
         redirect("/time_to_edit/{}".format(id))
+    else:
+        return HTTPError(404, "Page not found")
 
 
 import ast
 @route('/time_to_edit/<id>',is_xhr=False)
 def itstime(id):
 
+    print(id)
+    print(type(id))
+
     the_val = ast.literal_eval(id)
+
+    print(type(the_val))
 
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
     query = "SELECT * FROM points WHERE ID = {}".format(the_val)
     data_to_edit = c.execute(query).fetchall()
     conn.commit()
-    #redirect('/time_to_edit/{}'.format(data_to_edit))
+    
     return template('edit', data_in_a_list=data_to_edit[0])
 
 
@@ -134,11 +136,10 @@ def update_row():
 
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
-    query = "UPDATE points SET Count = {}, Colour = '{}' WHERE ID = {}".format(editedcount,editedcolour,id)
-    # c.execute("UPDATE database SET temp = ?", (new_temp))
-    print(query)
+    query = "UPDATE points SET Count = {}, Colour = '{}' WHERE ID = {}".format(editedcount,editedcolour,id)    
     c.execute(query)
     conn.commit()
+    
     redirect("/")
 
 

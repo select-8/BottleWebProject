@@ -11,11 +11,11 @@
         </div>
         <div class="form-group">
           <label for="City">Longitude</label>
-          <input type="text" class="form-control" id="Lang" placeholder="Click on the map" name="newLong">
+          <input type="text" class="form-control" id="Lang" placeholder="Click on the map (ish)" name="newLong">
         </div>
         <div class="form-group">
           <label for="City">Latitude</label>
-          <input type="text" class="form-control" id="Lat" placeholder="Click on the map" name="newLat">
+          <input type="text" class="form-control" id="Lat" placeholder="Click on the map (ish)" name="newLat">
         </div>
         <div class="form-group">
           <label for="Count">Count</label>
