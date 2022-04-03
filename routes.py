@@ -6,6 +6,7 @@ from bottle import route, view, redirect, template, request, HTTPError
 from bottle import post, get, put, delete
 import json
 import sqlite3
+import requests
 
 #helper functions
 def zipper(rows,headers):
@@ -31,12 +32,14 @@ def hello():
     redirect('/show/table')
 
 
-@route('/show/<view>', method='GET')
+@route('/show/<view>', method=['GET','POST'])
 def showall(view,db):
 
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
-    rows = c.execute('SELECT * from points').fetchall()
+    rows = c.execute('SELECT * FROM points WHERE IsVisible = 1').fetchall()
+    # for r in rows:
+    #     print('Row: ', r)
     columns = c.execute('PRAGMA table_info(points);').fetchall()
     
     headers = []
@@ -44,7 +47,12 @@ def showall(view,db):
     for c in columns:
         headers.append(c[1])
 
+    # Remove the IsVisible column
+    columns = columns[:-1]
+
     table_data = zipper(rows,headers)
+    # for td in table_data:
+    #     print('As a Dict:', td)
 
     if rows:
         if view == 'table':
@@ -68,19 +76,15 @@ def add_new():
 def add_new():
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
-    city = request.forms.get('newcity')
-    colour = request.forms.get('newcolour')
-    c.execute('INSERT INTO points (Name,Colour) VALUES(?,?)', (city,colour))
+    city = request.forms.get('newCity')
+    long = request.forms.get('newLong')
+    lat = request.forms.get('newLat')
+    count = request.forms.get('newCount')
+    colour = request.forms.get('newColour')
+    c.execute('INSERT INTO points (Name,Long,Lat,Count,Colour,IsVisible) VALUES(?,?,?,?,?,1)', (city,long,lat,count,colour))
     conn.commit()
     redirect("/")
     c.close()
-
-
-@route('/update', method='POST')
-def update_row():
-    data = request.forms.get('nnn')
-    print('DATA', data)
-    redirect("/")
 
 
 @post('/add_item_button')
@@ -90,29 +94,65 @@ def goadd():
         redirect("/new")
 
 
-@post('/get_row_to_edit',is_xhr=True)
+@route('/get_row_to_edit',is_xhr=True, method=['GET', 'POST'])
 def goedit():
+    if request:
+        id = json.load(request.body)
+        print(id)
+        conn = sqlite3.connect("./data/simpledb.db")
+        c = conn.cursor()
+        query = "SELECT * FROM points WHERE ID = {}".format(id)
+        data_to_edit = c.execute(query).fetchall()
 
-    id = json.load(request.body)
+        conn.commit()
+
+        redirect("/time_to_edit/{}".format(id))
+
+
+import ast
+@route('/time_to_edit/<id>',is_xhr=False)
+def itstime(id):
+
+    the_val = ast.literal_eval(id)
+
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
-    query = "SELECT * FROM points WHERE ID = {}".format(id)
+    query = "SELECT * FROM points WHERE ID = {}".format(the_val)
     data_to_edit = c.execute(query).fetchall()
     conn.commit()
-    redirect("/edit_the_row/{}".format(data_to_edit[0]))
+    #redirect('/time_to_edit/{}'.format(data_to_edit))
+    return template('edit', data_in_a_list=data_to_edit[0])
 
 
-from ast import literal_eval
-@route('/edit_the_row/<data>')
-def open_edit_form(data):
-    data_in_a_list = list(literal_eval(data))
-    if data_in_a_list:
-        return template('edit', data_in_a_list=data)
-        
 
-# @route('/time_to_edit/<data>')
-# def getediting(data):
-#     return template('edit', data_in_a_list=data)
+@route('/update', method='POST')
+def update_row():
+    id = request.forms.get('id')
+    editedcount = request.forms.get('editedcount')
+    editedcolour = request.forms.get('editedcolour')
+    print(id, editedcount, editedcolour)
+
+    conn = sqlite3.connect("./data/simpledb.db")
+    c = conn.cursor()
+    query = "UPDATE points SET Count = {}, Colour = '{}' WHERE ID = {}".format(editedcount,editedcolour,id)
+    # c.execute("UPDATE database SET temp = ?", (new_temp))
+    print(query)
+    c.execute(query)
+    conn.commit()
+    redirect("/")
+
+
+@post('/delete',is_xhr=True)
+def hide_record():
+    id = json.load(request.body)
+    print('ID:', id)
+    conn = sqlite3.connect("./data/simpledb.db")
+    c = conn.cursor()
+    query = "UPDATE points SET IsVisible = 0 WHERE ID = {}".format(id)
+    print(query)
+    c.execute(query)
+    conn.commit()
+    redirect("/")
 
 
 @post('/mapdata',is_xhr=True)

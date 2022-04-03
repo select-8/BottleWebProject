@@ -1,12 +1,13 @@
 var map = L.map('bottle-map').setView([53.450140, -7.266155], 6);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery � <a href="https://www.mapbox.com/">Mapbox</a>',
-    minZoom: 0,
-    maxZoom: 20,
+L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+	attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+    minZoom: 6,
+    maxZoom: 8,
     ext: 'png',
     subdomains: 'abcd'
 }).addTo(map);
+map.setZoom(7);
 map.on('click', function (e) {
 
     var data = JSON.stringify({ 'data': { 'long': e.latlng.lng, 'lat': e.latlng.lat } });

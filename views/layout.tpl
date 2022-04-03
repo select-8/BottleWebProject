@@ -14,12 +14,7 @@
 
 <body>   
     <div class="container body-content">
-        {{!base}}
-        <br />
-        <div id="bottle-map" style="height:420px;width:420px;margin:0 auto;display: none;"></div>
-        <!--footer>
-            <p style="position:absolute; bottom:0px;">A Bottle API</p>
-        </footer-->
+        {{!base}}        
     </div>
 
     <script src="/static/scripts/jquery-1.10.2.js"></script>
