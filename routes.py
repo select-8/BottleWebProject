@@ -8,13 +8,13 @@ import json
 import sqlite3
 import requests
 
-#helper functions
-def zipper(rows,headers):
+# helper functions
+def zipper(rows, headers):
 
     # zip headers and rows and add to list
     zipped_data = []
     for r in rows:
-        zipped = zip(headers,r)
+        zipped = zip(headers, r)
         zipped_data.append(list(zipped))
 
     # convert tuples to a dictionary
@@ -26,23 +26,37 @@ def zipper(rows,headers):
     return zipped_data_as_dict
 
 
-@route('/')
+"""
+Redirect from root route to table view
+"""
+
+
+@route("/")
 def index():
-    redirect('/show/table')
+    redirect("/show/table")
 
 
-@route('/show/<view>')
-def showall(view,db):
+"""
+Retrieve all IsVisible data from the db and convert to a dictionary structure.
+Then either render to table view, render as json or return 404 if page not found.
+"""
 
-    conn = sqlite3.connect("./data/simpledb.db")
-    c = conn.cursor()
-    rows = c.execute('SELECT * FROM points WHERE IsVisible = 1').fetchall()
-    print('')
-    for r in rows:
-        print('Row: ', r)
-    print('')
-    columns = c.execute('PRAGMA table_info(points);').fetchall()
-    
+
+@route("/show/<view>")
+def showall(view, db):
+
+    try:
+        conn = sqlite3.connect("./data/simpledb.db")
+        c = conn.cursor()
+        rows = c.execute("SELECT * FROM points WHERE IsVisible = 1").fetchall()
+        print("")
+        for r in rows:
+            print("Row: ", r)
+        print("")
+        columns = c.execute("PRAGMA table_info(points);").fetchall()
+    except Exception as Ex:
+        print(Ex)
+
     headers = []
 
     for c in columns:
@@ -51,53 +65,70 @@ def showall(view,db):
     # Remove the IsVisible column
     columns = columns[:-1]
 
-    table_data = zipper(rows,headers)
+    table_data = zipper(rows, headers)
 
     for td in table_data:
-        print('As a Dict:', td)
-    print('')
+        print("As a Dict:", td)
+    print("")
     if rows:
-        if view == 'table':
-            output = template('show', table_data=table_data, columns=columns)
-        elif view == 'raw':
+        if view == "table":
+            output = template("show", table_data=table_data, columns=columns)
+        elif view == "raw":
             output = json.dumps(rows)
         else:
             output = HTTPError(404, "Page not found")
         return output
 
-    # if request.forms.get('newdata'):
-    #     redirect("/new")
+
+"""
+When the 'Add New Location' is pressed, 
+check for the POST response and return the Add Data form
+"""
 
 
-# @route('/new')
-# def add_new():
-#     return template('add_data')
+@post("/add_item_button")
+def goadd():
+
+    if request.forms.get("newdata"):
+        return template("add_data")
+    else:
+        return HTTPError(404, "Page not found")
 
 
-@route('/new', method='POST')
+"""
+Get data POSTed form in the add_data template and insert value to the db.
+Redirect back to the root url.
+"""
+
+
+@route("/new", method="POST")
 def add_new():
+
+    city = request.forms.get("newCity")
+    long = request.forms.get("newLong")
+    lat = request.forms.get("newLat")
+    count = request.forms.get("newCount")
+    colour = request.forms.get("newColour")
+
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
-    city = request.forms.get('newCity')
-    long = request.forms.get('newLong')
-    lat = request.forms.get('newLat')
-    count = request.forms.get('newCount')
-    colour = request.forms.get('newColour')
-    c.execute('INSERT INTO points (Name,Long,Lat,Count,Colour,IsVisible) VALUES(?,?,?,?,?,1)', (city,long,lat,count,colour))
+    c.execute(
+        "INSERT INTO points (Name,Long,Lat,Count,Colour,IsVisible) VALUES(?,?,?,?,?,1)",
+        (city, long, lat, count, colour),
+    )
     conn.commit()
     redirect("/")
     c.close()
 
 
-@post('/add_item_button')
-def goadd():
+"""
+When the Edit button is clicked the JS show() function is called
+and the row's id value (same as db row's id) is POSTed.
+This value is then redirected to the /time_to_edit route.
+"""
 
-    if request.forms.get('newdata'):
-        #redirect("/new")
-        return template('add_data')
 
-
-@route('/get_row_to_edit',is_xhr=True, method=['GET', 'POST'])
+@post("/get_row_to_edit", is_xhr=True)
 def goedit():
     if request:
         id = json.load(request.body)
@@ -106,57 +137,81 @@ def goedit():
         return HTTPError(404, "Page not found")
 
 
-import ast
-@route('/time_to_edit/<id>',is_xhr=False)
+"""
+The db id value has been redirected from the /get_row_to_edit route.
+Use the id to select the relevant row from the db.
+Pass this data to the edit form.
+The edit form is loaded by bottle but url is not (not sure why).
+The url is instead called from the JS show() function.
+"""
+
+
+@route("/time_to_edit/<id>")
 def itstime(id):
 
-    print(id)
-    print(type(id))
-
-    the_val = ast.literal_eval(id)
-
-    print(type(the_val))
-
+    id_as_int = int(id)
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
-    query = "SELECT * FROM points WHERE ID = {}".format(the_val)
+    query = "SELECT * FROM points WHERE ID = {}".format(id_as_int)
     data_to_edit = c.execute(query).fetchall()
     conn.commit()
-    
-    return template('edit', data_in_a_list=data_to_edit[0])
+
+    return template("edit", data_in_a_list=data_to_edit[0])
 
 
+"""
+This route is called when the submit button in the edit form is clicked.
+The POSTed form data is used to update the db values for the entry.
+Redirect back to thr root url.
+"""
 
-@route('/update', method='POST')
+
+@post("/update")
 def update_row():
-    id = request.forms.get('id')
-    editedcount = request.forms.get('editedcount')
-    editedcolour = request.forms.get('editedcolour')
+    id = request.forms.get("id")
+    editedcount = request.forms.get("editedcount")
+    editedcolour = request.forms.get("editedcolour")
     print(id, editedcount, editedcolour)
 
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
-    query = "UPDATE points SET Count = {}, Colour = '{}' WHERE ID = {}".format(editedcount,editedcolour,id)    
+    query = "UPDATE points SET Count = {}, Colour = '{}' WHERE ID = {}".format(
+        editedcount, editedcolour, id
+    )
     c.execute(query)
     conn.commit()
-    
+
     redirect("/")
 
 
-@post('/delete',is_xhr=True)
+"""
+When the Delete button is clicked the JS hide() function is called
+and the row's id value (same as db row's id) is POSTed.
+This value is used to set IsVisible to False in the db.
+The row is no longer selected by showall().
+The page is refreshed by the JS hide() function.
+"""
+
+
+@post("/delete", is_xhr=True)
 def hide_record():
     id = json.load(request.body)
-    print('ID:', id)
+    print("ID:", id)
     conn = sqlite3.connect("./data/simpledb.db")
     c = conn.cursor()
     query = "UPDATE points SET IsVisible = 0 WHERE ID = {}".format(id)
     print(query)
     c.execute(query)
     conn.commit()
-    redirect("/")
 
 
-@post('/mapdata',is_xhr=True)
+"""
+This route is called when the map is clicked.
+TODO: Somehow pass this data to the add_data form (probably jQuery)
+"""
+
+
+@post("/mapdata", is_xhr=True)
 def get_map_data():
 
     geog = json.load(request.body)
