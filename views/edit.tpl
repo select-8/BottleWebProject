@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row">
     <div class="col-md-4">
-      <h3>Edit an entry:</h3>
+      <h2>Edit a location:</h2>
       <br />
       <form action="/update" method="POST">
         <div class="form-group" style="display: none;">

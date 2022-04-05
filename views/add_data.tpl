@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row">
     <div class="col-md-4">
-      <h3>Add a new place to the list:</h3>
+      <h2>Add a new location:</h2>
       <br />
       <form action="/new" method="POST">
         <div class="form-group">

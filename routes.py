@@ -2,8 +2,8 @@
 Routes for the bottle application.
 """
 
-from bottle import route, view, redirect, template, request, HTTPError
-from bottle import post, get, put, delete
+from bottle import route, redirect, template, request, HTTPError
+from bottle import post, get
 import json
 import sqlite3
 import requests
@@ -43,7 +43,7 @@ Then either render to table view, render as json or return 404 if page not found
 
 
 @route("/show/<view>")
-def showall(view, db):
+def showall(view):
 
     try:
         conn = sqlite3.connect("./data/simpledb.db")
@@ -70,6 +70,7 @@ def showall(view, db):
     for td in table_data:
         print("As a Dict:", td)
     print("")
+    
     if rows:
         if view == "table":
             output = template("show", table_data=table_data, columns=columns)

@@ -6,20 +6,21 @@
         <thead>
           <tr>
           %for h in columns:
-          <th scope="col">{{h[1]}}</th>
+          <th scope="col" style="text-align: center;">{{h[1]}}</th>
           %end
+          </tr>
         </thead>
         % for td in table_data:
         <tr id={{td['ID']}}>
           % for key, value in td.items():
           % if key != 'IsVisible':
-        <td class="row-data">{{value}}</td>
+        <td style="text-align: center;" class="row-data">{{value}}</td>
           % end
           % end
-        <td>
+        <td style="text-align: center;">
           <button action='/get_row_to_edit' type="submit" onclick="show()" class="btn btn-info">Edit</button>
         </td>
-        <td>
+        <td style="text-align: center;">
           <button type="submit" onclick="hide()" class="btn btn-danger">Delete</button>
         </td>
         </tr>
