@@ -1,12 +1,12 @@
-Create Virtual Env:
-    C:\Python38\Scripts\virtualenv.exe C:\VirtualEnvs\bottle-project
 
-Install requirments:
-    Some libraries are not available via pip and need to be installed from wheels you can download here: https://www.lfd.uci.edu/~gohlke/pythonlibs/
-        See commented out entries in requirments.txt for which wheels are required. Make sure the get the correct ones for your Python version.
-    Update the commented out entries with the path to the extrated wheels.
-    Activate the venv: C:\VirtualEnvs\bottle-project\Scripts\activate
-    Install from requirments.txt: pip install -r requirments.txt
+
+Create Virtual Environment using virtualenv (replacing the paths to whatever they might be on your machine):
+    Open a terminal and cd to the BottleWebProject folder, then do:ß
+        C:\Python38\Scripts\virtualenv.exe C:\VirtualEnvs\bottle-project
+        C:\VirtualEnvs\bottle-project\Scripts\activate
+
+Install from requirments.txt: 
+    pip install -r requirments.txt
 
 To run the app:
     python app.py

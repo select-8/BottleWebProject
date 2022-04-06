@@ -6,7 +6,6 @@ from bottle import route, redirect, template, request, HTTPError
 from bottle import post, get
 import json
 import sqlite3
-import requests
 
 # helper functions
 def zipper(rows, headers):
@@ -70,7 +69,7 @@ def showall(view):
     for td in table_data:
         print("As a Dict:", td)
     print("")
-    
+
     if rows:
         if view == "table":
             output = template("show", table_data=table_data, columns=columns)

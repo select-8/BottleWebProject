@@ -41,7 +41,7 @@ function addMarker(lat,long,value,colour) {
 };
 
 var data = httpGet('http://localhost:5555/show/raw')
-console.log(data);
+//console.log(data);
 for (let i = 0; i < data.length; i++) {
     if (data[i][2] !== null) {
         addMarker(data[i][3],data[i][2],data[i][4],data[i][5]);
