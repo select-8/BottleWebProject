@@ -1,0 +1,2 @@
+- Figure out the whole is_xhr thing and why its not redireting or rendering in python.
+- Add functionality to add click coords directly to form data on map click (currenlty just logged to console)
